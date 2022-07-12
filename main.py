@@ -19,7 +19,7 @@ class Assistant:
         # Initalize TTS Engine
         self.engine = pyttsx3.init()
 
-        # Set Engine Properties
+        # Set TTS Engine Properties
         self.rate = rate
         self.voiceId = voiceId
         self.engine.setProperty("rate", self.rate)
