@@ -1,0 +1,95 @@
+{
+  "GoogleSearch": {
+    "intents": ["Search for", "Hi Bixby, search for"],
+    "responses": [
+      "Searching for {SEARCH_KEY}...",
+      "That's what I've found about {SEARCH_KEY}",
+      "Here are the results",
+      "I've looked it up for you. Here is what I got for {SEARCH_KEY}"],
+    "actions": ["action::googlesearch"]
+  },
+
+  "Wikipedia": {
+    "intents": ["What is", "Who is", "Tell me about the"],
+    "responses": [
+      "That's what I've found about {SEARCH_KEY}"],
+    "error-responses": ["Sorry, I couldn't find any information about {SEARCH_KEY}"],
+    "actions": ["action::wikisearch"]
+  },
+
+  "Date": {
+    "intents": ["What's the date?", "What day is today?", "Can you tell me the date?", "Tell me the date", "Date"],
+    "responses": [
+      "Today is the {DATE}",
+      "The {DATE}"
+      ],
+    "actions": ["action::date"]
+  },
+
+  "Time": {
+    "intents": ["What's the time?", "Tell me the time", "What time is now?", "Time"],
+    "responses": [
+      "The time is {TIME}",
+      "{TIME}"
+    ],
+    "actions": ["action::time"]
+  },
+
+  "Joke": {
+    "intents": [
+      "tell a joke",
+      "joke",
+      "make me laugh"
+    ],
+    "responses": [
+      "joke1",
+      "joke2",
+      "joke3",
+      "joke4",
+      "joke5"
+    ],
+    "actions": [
+      "action::joke"
+    ]
+  }
+    ,"Greeting": {
+    "intents": [
+      "Hello there",
+      "hi Bixby",
+      "Ok Bixby",
+      "hi there",
+      "What's up Bixby?",
+      "Hello Bixby",
+      "Ok bixby",
+      "what's up?"],
+    "responses": [
+      "Hello there, how can i help you?",
+      "Ready to help.",
+      "Nice seeing you again!",
+      "Just tell me what to do.",
+      "There are a lot of things I can do. What do you need?",
+      "I'm here, what can i do for you?"],
+    "actions": []
+  },
+
+  "UNMATCHED": {
+    "intents": [],
+    "responses": [
+      "Sorry, it seems like I have no answer for your request.",
+      "I didn't understand. Please try again.",
+      "I'm sorry, please try again",
+      "Sorry, it looks like i don't have the information you need"],
+    "actions": []
+
+  },
+  "EXCEPTION": {
+    "intents": [],
+    "responses": [
+      "I'm sorry, it seems that I am unable to help you in the moment.",
+      "Something went wrong. PLease try again later",
+      "Sorry, something isn't working"
+    ],
+    "actions": []
+  }
+
+}
