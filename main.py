@@ -10,29 +10,39 @@ import colorama as c
 import asyncio
 
 
-def cyan(text: str): return c.Fore.CYAN + text + c.Fore.RESET
+def cyan(text: str):
+    return c.Fore.CYAN + text + c.Fore.RESET
 
 
 class Assistant:
-    def __init__(self, rate, voice_id, matching_percent, max_idle_time):
+    def __init__(self, rate, voiceId, matchingPercent, maxIdle):
+        # Initalize TTS Engine
         self.engine = pyttsx3.init()
+
+        # Set Engine Properties
         self.rate = rate
-        self.voice_id = voice_id
-        self.matching_percent = matching_percent
+        self.voiceId = voiceId
         self.engine.setProperty("rate", self.rate)
         voices = self.engine.getProperty('voices')
-        self.engine.setProperty('voice', voices[self.voice_id].id)
+        self.engine.setProperty('voice', voices[self.voiceId].id)
+
+        # Set Assistant Settings
+        self.matchingPercent = matchingPercent # Set minimum matching percentage to match intents
+        self.maxIdle = maxIdle # Maximum Time for the user 
+        self.idleTime = 0
+        self.isIdle = False
+
+        # Load Intents
         with open("Intents.json", 'r') as f:
             self.intents = json.load(f)
-        self.max_idle_time = max_idle_time
-        self.idle_time = 0
-        self.idle = False
-
+        
+        # Start Tracking Idle Mode
         #idle = threading.Thread(target=self.track_idle)
         #idle.start()
 
     def handle_command(self, command):
-        if command == '':
+        if command is None:
+            print("hi")
             return
         responses = None
         matched = self.match(command)
@@ -52,7 +62,7 @@ class Assistant:
         if len(actions) != 0:
             for action in actions:
                 if action.endswith("joke"):
-                    self.broadcast(["hi", ["sds", "sdsd"], "s", ["2"]], say=True, delay=0)
+                    self.broadcast(["hi", ["sds", "sdsd"], "s", ["2"]], sound=True, delay=0)
 
                 elif action.endswith("date"):
                     self.broadcast(response.replace("{DATE}", Modules.get_date()))
@@ -106,36 +116,35 @@ class Assistant:
                     intents.append(response)
         print(intents)
         highest = process.extractOne(command, intents)
-        if highest[1] >= self.matching_percent:
+        if highest[1] >= self.matchingPercent:
             return highest[0]
         else:
             return "Unmatched"
 
-    def broadcast(self, text, say=True, delay=0.7):
+    def broadcast(self, text, sound=True, delay=0.7):
         if type(text) is str:
             print(cyan(text))
-            if say is True:
+            if sound is True:
                 if not text.startswith("https://") and not text.startswith("www"):
                     self.engine.say(text)
                     self.engine.runAndWait()
         elif type(text) is list:
             for t in text:
                 time.sleep(delay)
-                self.broadcast(t, say=say)
-
+                self.broadcast(t, sound=sound)
         else:
             exit("Unsupported datatype for self.broadcast()")
 
     def listen(self):
         command = input("Enter your command:\n")
-        self.idle_time = 0
+        self.idleTime = 0
         return command
 
     async def track_idle(self):
-        while not self.idle_time < self.max_idle_time:#keyboard.KEY_DOWN :#self.idle_time < self.max_idle_time:
+        while not self.idleTime < self.maxIdle:#keyboard.KEY_DOWN :#self.idleTime < self.maxIdle:
             time.sleep(1)
-            self.idle_time += 1
-        self.idle = True
+            self.idleTime += 1
+        self.isIdle = True
 
     def get_holder_response(self, holder: str, placeholder: str, intent_options: list, response : str):
         holder = holder.lower()
@@ -147,11 +156,11 @@ class Assistant:
 def main():
     assistant = Assistant(
         rate=180,
-        voice_id=2,
-        matching_percent=90,
-        max_idle_time=180
+        voiceId=2,
+        matchingPercent=90,
+        maxIdle=180
     )
-    while assistant.idle is False:
+    while assistant.isIdle is False:
         try:
             command = assistant.listen()
             assistant.handle_command(command)
