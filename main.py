@@ -64,13 +64,13 @@ class Assistant:
         if command == '':
             return
         matchedIntent = self.matchIntent(command)
-        parent = self.getIntentClassifier(matchedIntent)
-        if parent is None:
-            parent = "UNMATCHED"
+        classifier = self.getIntentClassifier(matchedIntent)
+        if classifier is None:
+            classifier = "UNMATCHED"
 
-        allResponses = self.intentsJson[parent]["responses"]
+        allResponses = self.intentsJson[classifier]["responses"]
         response = random.choice(allResponses)
-        actions = self.intentsJson[parent]["actions"]
+        actions = self.intentsJson[classifier]["actions"]
         if len(actions) != 0:
             for action in actions:
                 if action.endswith("joke"):
@@ -89,7 +89,7 @@ class Assistant:
                         search_key = search_key.replace(i, "")
                     result = Modules.googlesearch(search_key)
                     if result is None:
-                        response = random.choice(self.intentsJson[parent]["error-responses"])
+                        response = random.choice(self.intentsJson[classifier]["error-responses"])
                         self.broadcast(response.replace("{SEARCH_KEY}", search_key))
                     else:
                         self.broadcast(response.replace("{SEARCH_KEY}", search_key))
@@ -102,14 +102,14 @@ class Assistant:
                         search_key = search_key.replace(i, "")
                     result = Modules.wikisearch(search_key)
                     if result is None:
-                        response = random.choice(self.intentsJson[parent]["error-responses"])
+                        response = random.choice(self.intentsJson[classifier]["error-responses"])
                         self.broadcast(response.replace("{SEARCH_KEY}", search_key))
                     else:
                         self.broadcast(response.replace("{SEARCH_KEY}", search_key))
                         self.broadcast(result[:result.find(".", 5)+1])
 
         else:
-            if parent == "UNMATCHED":
+            if classifier == "UNMATCHED":
                 result = Modules.wikisearch(command)
                 if result is None:
                     self.broadcast(random.choice(self.intentsJson["UNMATCHED"]["responses"]))
