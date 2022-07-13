@@ -33,31 +33,44 @@ class Assistant:
 
         # Load Intents
         with open("Intents.json", 'r') as f:
-            self.intents = json.load(f)
+            self.intentsJson = json.load(f)
+        
+        self.commandIntents = [] # User Accssesible Commands
+        self.ignoredClassifiers = ["UNMATCHED", "EXCEPTION", "IDLE"] # System intents
+        for item in self.intentsJson:
+            if item not in self.ignoredClassifiers:
+                for intent in self.intentsJson[item]["intents"]:
+                    self.commandIntents.append(intent)
         
         # Start Tracking Idle Mode
-        idle = threading.Thread(target=self.trackIdle)
-        idle.start()
+        #idle = threading.Thread(target=self.trackIdle)
+        #idle.start()
+
+    def matchIntent(self, command):
+        highestMatch = process.extractOne(command, self.commandIntents)
+        if highestMatch[1] >= self.matchingPercent:
+            intent = highestMatch[0]
+            return intent
+        else:
+            intent = "UNMATCHED"
+            return intent
+
+    def getIntentParent(self, intent: str):
+        for classifier in self.intentsJson:
+            if classifier not in self.ignoredClassifiers and intent in self.intentsJson[classifier]["intents"]:
+                return classifier
 
     def handleCommand(self, command):
-        if command is None:
-            print("hi")
+        if command == '':
             return
-        responses = None
-        matched = self.matchIntent(command)
-        intent = None
-        for item in self.intents:
-            if item != "UNMATCHED" and matched in self.intents[item]["intents"]:
-                responses = self.intents[item]["responses"]
-                intent = item
-        if responses is None:
-            responses = self.intents["UNMATCHED"]["responses"]
-            intent = "UNMATCHED"
+        matchedIntent = self.matchIntent(command)
+        parent = self.getIntentParent(matchedIntent)
+        if parent is None:
+            parent = "UNMATCHED"
 
-        print(matched + f"({intent})")
-
-        response = random.choice(responses)
-        actions = self.intents[intent]["actions"]
+        allResponses = self.intentsJson[parent]["responses"]
+        response = random.choice(allResponses)
+        actions = self.intentsJson[parent]["actions"]
         if len(actions) != 0:
             for action in actions:
                 if action.endswith("joke"):
@@ -76,7 +89,7 @@ class Assistant:
                         search_key = search_key.replace(i, "")
                     result = Modules.googlesearch(search_key)
                     if result is None:
-                        response = random.choice(self.intents[intent]["error-responses"])
+                        response = random.choice(self.intentsJson[parent]["error-responses"])
                         self.broadcast(response.replace("{SEARCH_KEY}", search_key))
                     else:
                         self.broadcast(response.replace("{SEARCH_KEY}", search_key))
@@ -89,67 +102,48 @@ class Assistant:
                         search_key = search_key.replace(i, "")
                     result = Modules.wikisearch(search_key)
                     if result is None:
-                        response = random.choice(self.intents[intent]["error-responses"])
+                        response = random.choice(self.intentsJson[parent]["error-responses"])
                         self.broadcast(response.replace("{SEARCH_KEY}", search_key))
                     else:
                         self.broadcast(response.replace("{SEARCH_KEY}", search_key))
                         self.broadcast(result[:result.find(".", 5)+1])
 
         else:
-            if intent == "UNMATCHED":
+            if parent == "UNMATCHED":
                 result = Modules.wikisearch(command)
                 if result is None:
-                    self.broadcast(random.choice(self.intents["UNMATCHED"]["responses"]))
+                    self.broadcast(random.choice(self.intentsJson["UNMATCHED"]["responses"]))
                 else:
-                    response = random.choice(self.intents["Wikipedia"]["responses"])
+                    response = random.choice(self.intentsJson["Wikipedia"]["responses"])
                     self.broadcast(response.replace("{SEARCH_KEY}", command))
                     self.broadcast(result[:result.find(".", 5) + 1])
             else:
                 self.broadcast(response)
 
-    def matchIntent(self, command):
-        intents = []
-        for item in self.intents:
-            if item != "Unmatched":
-                for response in self.intents[item]["intents"]:
-                    intents.append(response)
-        print(intents)
-        highest = process.extractOne(command, intents)
-        if highest[1] >= self.matchingPercent:
-            return highest[0]
-        else:
-            return "Unmatched"
-
-    def broadcast(self, text, sound=True, delay=0.7):
-        if type(text) is str:
-            print(output(text))
+    def broadcast(self, message, sound: bool=True, delay: float=0.7):
+        if type(message) is str:
+            print(output(message))
             if sound is True:
-                if not text.startswith("https://") and not text.startswith("www"):
-                    self.engine.say(text)
+                if not message.startswith("https://") and not message.startswith("www"):
+                    self.engine.say(message)
                     self.engine.runAndWait()
-        elif type(text) is list:
-            for t in text:
+        elif type(message) is list:
+            for item in message:
                 time.sleep(delay)
-                self.broadcast(t, sound=sound)
+                self.broadcast(item, sound=sound)
         else:
-            exit("Unsupported datatype for self.broadcast()")
+            exit(f"Unsupported datatype for self.broadcast() ({type(message)})")
 
     def listen(self):
         command = input("Enter your command:\n")
         self.idleTime = 0
         return command
 
-    async def trackIdle(self):
+    def trackIdle(self):
         while not self.idleTime < self.maxIdle:#keyboard.KEY_DOWN :#self.idleTime < self.maxIdle:
             time.sleep(1)
             self.idleTime += 1
         self.isIdle = True
-
-    def get_holder_response(self, holder: str, placeholder: str, intent_options: list, response : str):
-        holder = holder.lower()
-        for i in intent_options:
-            holder = holder.replace(i, "")
-        return response.replace(f"{placeholder.upper()}", holder)
 
 
 def main():
@@ -157,7 +151,7 @@ def main():
         rate=180,
         voiceId=2,
         matchingPercent=90,
-        maxIdle=180
+        maxIdle=60
     )
     while assistant.isIdle is False:
         try:
@@ -165,8 +159,9 @@ def main():
             assistant.handleCommand(command)
         except Exception as error:
             assistant.broadcast(
-                random.choice(assistant.intents["EXCEPTION"]["responses"]))
+                random.choice(assistant.intentsJson["EXCEPTION"]["responses"]))
             assistant.broadcast(str(error))
+            raise error
 
 
 if __name__ == "__main__":
