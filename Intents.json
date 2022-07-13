@@ -6,6 +6,7 @@
       "That's what I've found about {SEARCH_KEY}",
       "Here are the results",
       "I've looked it up for you. Here is what I got for {SEARCH_KEY}"],
+    "error-responses": ["Sorry, I couldn't find any information about {SEARCH_KEY}"],
     "actions": ["action::googlesearch"]
   },
 
@@ -23,6 +24,7 @@
       "Today is the {DATE}",
       "The {DATE}"
       ],
+      "error-responses": [],
     "actions": ["action::date"]
   },
 
@@ -32,6 +34,7 @@
       "The time is {TIME}",
       "{TIME}"
     ],
+    "error-responses": [],
     "actions": ["action::time"]
   },
 
@@ -48,6 +51,7 @@
       "joke4",
       "joke5"
     ],
+    "error-responses": [],
     "actions": [
       "action::joke"
     ]
@@ -69,6 +73,7 @@
       "Just tell me what to do.",
       "There are a lot of things I can do. What do you need?",
       "I'm here, what can i do for you?"],
+      "error-responses": [],
     "actions": []
   },
 
@@ -79,6 +84,7 @@
       "I didn't understand. Please try again.",
       "I'm sorry, please try again",
       "Sorry, it looks like i don't have the information you need"],
+      "error-responses": [],
     "actions": []
 
   },
@@ -89,6 +95,7 @@
       "Something went wrong. PLease try again later",
       "Sorry, something isn't working"
     ],
+    "error-responses": [],
     "actions": []
   }
 
