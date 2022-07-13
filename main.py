@@ -37,15 +37,15 @@ class Assistant:
             self.intents = json.load(f)
         
         # Start Tracking Idle Mode
-        #idle = threading.Thread(target=self.track_idle)
-        #idle.start()
+        idle = threading.Thread(target=self.trackIdle)
+        idle.start()
 
-    def handle_command(self, command):
+    def handleCommand(self, command):
         if command is None:
             print("hi")
             return
         responses = None
-        matched = self.match(command)
+        matched = self.matchIntent(command)
         intent = None
         for item in self.intents:
             if item != "UNMATCHED" and matched in self.intents[item]["intents"]:
@@ -108,7 +108,7 @@ class Assistant:
             else:
                 self.broadcast(response)
 
-    def match(self, command):
+    def matchIntent(self, command):
         intents = []
         for item in self.intents:
             if item != "Unmatched":
@@ -140,7 +140,7 @@ class Assistant:
         self.idleTime = 0
         return command
 
-    async def track_idle(self):
+    async def trackIdle(self):
         while not self.idleTime < self.maxIdle:#keyboard.KEY_DOWN :#self.idleTime < self.maxIdle:
             time.sleep(1)
             self.idleTime += 1
@@ -163,7 +163,7 @@ def main():
     while assistant.isIdle is False:
         try:
             command = assistant.listen()
-            assistant.handle_command(command)
+            assistant.handleCommand(command)
         except Exception as error:
             assistant.broadcast(
                 random.choice(assistant.intents["EXCEPTION"]["responses"]))
