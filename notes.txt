@@ -1,15 +1,6 @@
 rewrite:
 
+# Use exec() to run actions from Intents.json
+# Change Intents.json actions to python Assistant functions: f"self.{funcname}({stringArgs})"
 
-main.py => Assistant Core Concepts{
-    - listening for commands by cmd input and mic input;
-    - matching the commands to their corresponding intent;
-    - handling UNMATCHED commands;
-    - handling ERROR commands;
-}
-
-Core Directory => Handling Assistant Core Actions{
-    - checking for events and alarms;
-    - waiting for messages;
-    - running actions by their intent;
-}
+# Rewrite handleCommand function
