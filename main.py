@@ -1,4 +1,3 @@
-import keyboard
 import pyttsx3
 from fuzzywuzzy import process
 import json
@@ -10,7 +9,7 @@ import colorama as c
 import asyncio
 
 
-def cyan(text: str):
+def output(text: str):
     return c.Fore.CYAN + text + c.Fore.RESET
 
 
@@ -123,7 +122,7 @@ class Assistant:
 
     def broadcast(self, text, sound=True, delay=0.7):
         if type(text) is str:
-            print(cyan(text))
+            print(output(text))
             if sound is True:
                 if not text.startswith("https://") and not text.startswith("www"):
                     self.engine.say(text)
