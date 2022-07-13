@@ -94,54 +94,10 @@ class Assistant:
         allResponses = self.intentsJson[classifier]["responses"]
         response = random.choice(allResponses)
         actions = self.intentsJson[classifier]["actions"]
-        if len(actions) != 0:
-            for action in actions:
-                if action.endswith("joke"):
-                    self.broadcast(["hi", ["sds", "sdsd"], "s", ["2"]], sound=True, delay=0)
 
-                elif action.endswith("date"):
-                    self.broadcast(response.replace("{DATE}", Actions.get_date()))
-
-                elif action.endswith("time"):
-                    self.broadcast(response.replace("{TIME}", Actions.get_time()))
-
-                elif action.endswith("googlesearch"):
-                    intent_options = ["hi Bixby, search for ", "search for "]
-                    search_key = command.lower()
-                    for i in intent_options:
-                        search_key = search_key.replace(i, "")
-                    result = Actions.googlesearch(search_key)
-                    if result is None:
-                        response = random.choice(self.intentsJson[classifier]["error-responses"])
-                        self.broadcast(response.replace("{SEARCH_KEY}", search_key))
-                    else:
-                        self.broadcast(response.replace("{SEARCH_KEY}", search_key))
-                        self.broadcast(result)
-
-                elif action.endswith("wikisearch"):
-                    intent_options = ["who is ", "what is ", "tell me about ", "?", 'a', "an"]
-                    search_key = command.lower()
-                    for i in intent_options:
-                        search_key = search_key.replace(i, "")
-                    result = Actions.wikisearch(search_key)
-                    if result is None:
-                        response = random.choice(self.intentsJson[classifier]["error-responses"])
-                        self.broadcast(response.replace("{SEARCH_KEY}", search_key))
-                    else:
-                        self.broadcast(response.replace("{SEARCH_KEY}", search_key))
-                        self.broadcast(result[:result.find(".", 5)+1])
-
-        else:
-            if classifier == "UNMATCHED":
-                result = Actions.wikisearch(command)
-                if result is None:
-                    self.broadcast(random.choice(self.intentsJson["UNMATCHED"]["responses"]))
-                else:
-                    response = random.choice(self.intentsJson["Wikipedia"]["responses"])
-                    self.broadcast(response.replace("{SEARCH_KEY}", command))
-                    self.broadcast(result[:result.find(".", 5) + 1])
-            else:
-                self.broadcast(response)
+        for action in actions:
+            exec(f"result = {action}")
+            
 
 
 def main():
