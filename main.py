@@ -55,7 +55,7 @@ class Assistant:
             intent = "UNMATCHED"
             return intent
 
-    def getIntentParent(self, intent: str):
+    def getIntentClassifier(self, intent: str):
         for classifier in self.intentsJson:
             if classifier not in self.ignoredClassifiers and intent in self.intentsJson[classifier]["intents"]:
                 return classifier
@@ -64,7 +64,7 @@ class Assistant:
         if command == '':
             return
         matchedIntent = self.matchIntent(command)
-        parent = self.getIntentParent(matchedIntent)
+        parent = self.getIntentClassifier(matchedIntent)
         if parent is None:
             parent = "UNMATCHED"
 
